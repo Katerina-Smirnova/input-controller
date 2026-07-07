@@ -8,10 +8,10 @@ export class InputController {
         this.target=null;
         this.keyStatus = {};
         this.actionStatus = {};
-        this._helderKeyDown=this._helderKeyDown.bind(this);
-        this._helderKeyUp=this._helderKeyUp.bind(this);
-        this._helderFocus=this._helderFocus.bind(this)
-        this._helderBlur=this._helderBlur.bind(this)
+        this._handleKeyDown=this._handleKeyDown.bind(this);
+        this._handleKeyUp=this._handleKeyUp.bind(this);
+        this._handleFocus=this._handleFocus.bind(this)
+        this._handleBlur=this._handleBlur.bind(this)
 
 
 
@@ -35,6 +35,10 @@ export class InputController {
     enableAction(actionName){
         if(!this.actions[actionName])return
         this.actions[actionName].enabled=true 
+        this.actionStatus[actionName] = false
+        for (let key of this.actions[actionName].keys){
+            this.keyStatus[key]=false
+        }
     }
     disableAction(actionName){
         if(!this.actions[actionName])return
@@ -53,19 +57,19 @@ export class InputController {
         if(!dontEnable){
             this.enabled = true;
         }
-        document.addEventListener('keydown', this._helderKeyDown)
-        document.addEventListener('keyup', this._helderKeyUp)
-        this.target.addEventListener('focus', this._helderFocus)
-        this.target.addEventListener('blur', this._helderBlur)
+        document.addEventListener('keydown', this._handleKeyDown)
+        document.addEventListener('keyup', this._handleKeyUp)
+        this.target.addEventListener('focus', this._handleFocus)
+        this.target.addEventListener('blur', this._handleBlur)
 
     }
     detach(){
      
         if(!this.target) return
-        document.removeEventListener('keydown', this._helderKeyDown)
-        document.removeEventListener('keyup', this._helderKeyUp)
-        this.target.removeEventListener('focus', this._helderFocus)
-        this.target.removeEventListener('blur', this._helderBlur)
+        document.removeEventListener('keydown', this._handleKeyDown)
+        document.removeEventListener('keyup', this._handleKeyUp)
+        this.target.removeEventListener('focus', this._handleFocus)
+        this.target.removeEventListener('blur', this._handleBlur)
 
         this.target=null;
         this.enabled = false;
@@ -92,8 +96,18 @@ export class InputController {
         return this.keyStatus[keyCode]||false
     }
 
-    _helderKeyDown(event){
-        if(!this.enabled || !this.focused) return
+    _handleKeyDown(event){
+        if(!this.enabled || !this.focused){
+           for (let actionName in this.actions){
+            console.log(actionName)
+            console.log(this.actionStatus[actionName])
+            this.actionStatus[actionName] = false
+            for (let key in this.actions[actionName]){
+                this.keyStatus[key]=false
+            }
+           }
+           return
+        } 
   
         const keyCode = event.keyCode;
         this.keyStatus[keyCode] = true
@@ -108,8 +122,16 @@ export class InputController {
             }
         }
     }
-    _helderKeyUp(event){
-        if(!this.enabled || !this.focused) return
+    _handleKeyUp(event){
+        if(!this.enabled || !this.focused) {
+            for (let actionName in this.actions){
+            this.actionStatus[actionName] = false
+            for (let key in this.actions[actionName]){
+                this.keyStatus[key]=false
+            }
+           }
+           return
+        }
    
         const keyCode = event.keyCode;
         this.keyStatus[keyCode] = false
@@ -122,7 +144,6 @@ export class InputController {
             let allKey = true
 
             for (let key of action.keys){
-                console.log(key,this.keyStatus[key] )
                 if(this.keyStatus[key]){
                     allKey = false
                     break
@@ -146,12 +167,12 @@ export class InputController {
         })
         this.target.dispatchEvent(event)
     }
-    _helderFocus(event){
+    _handleFocus(event){
         // console.log('true')
         this.focused=true
         
     }
-    _helderBlur(event){
+    _handleBlur(event){
         // console.log('false')
         this.focused=false
         
