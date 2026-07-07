@@ -57,11 +57,11 @@ buttonDetach.addEventListener('click', ()=>{
     controller.detach()
 }) 
 buttonActivation.addEventListener('click', ()=>{
-    controller.enableAction()
+    controller.enabled=true
 
 })
 buttonDeactivation.addEventListener('click', ()=>{
-    controller.disableAction()
+    controller.enabled=false
 })
 
 document.addEventListener(InputController.ACTION_ACTIVATED, (event) =>{

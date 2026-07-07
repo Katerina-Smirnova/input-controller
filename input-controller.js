@@ -2,7 +2,7 @@ export class InputController {
     static ACTION_ACTIVATED ="input-controller:action-activate";
     static ACTION_DEACTIVATED = "input-controller:deactivate";
     constructor(actionsToBind, target){
-        this.enabled = false;
+        this._enabled = false;
         this.focused = true;
         this.actions = {};
         this.target=null;
@@ -12,16 +12,35 @@ export class InputController {
         this._handleKeyUp=this._handleKeyUp.bind(this);
         this._handleFocus=this._handleFocus.bind(this)
         this._handleBlur=this._handleBlur.bind(this)
-
-
-
         if(actionsToBind){
             this.bindActions(actionsToBind)
         }
         if(target){
             this.attach(target)
         }
+       
         
+    }
+    get enabled(){
+        return this._enabled
+    }
+    set enabled(value){
+        if(value){
+            this._enabled=true
+            for(let name in this.actions){
+                if(this.actionStatus[name]==true){
+                    this._dispatchEvent(InputController.ACTION_ACTIVATED, name) 
+                }
+            }
+        }
+        else{
+            this._enabled = false
+            for(let name in this.actions){
+                if(this.actionStatus[name]==true){
+                    this._dispatchEvent(InputController.ACTION_DEACTIVATED, name)
+                }
+            }
+        }
     }
     bindActions(actionsToBind){
         Object.assign(this.actions,actionsToBind)
@@ -33,15 +52,6 @@ export class InputController {
         }
     }
     enableAction(actionName){
-        if (actionName===undefined){
-            this.enabled = true
-            for(let name in this.actions){
-                if(this.actionStatus[name]==true){
-                    this._dispatchEvent(InputController.ACTION_ACTIVATED, name) 
-                }
-            }
-            return
-        }
         if(!this.actions[actionName])return
         this.actions[actionName].enabled=true 
         this.actionStatus[actionName] = false
@@ -50,15 +60,6 @@ export class InputController {
         }
     }
     disableAction(actionName){
-          if (actionName===undefined){
-            this.enabled = false
-            for(let name in this.actions){
-                if(this.actionStatus[name]==true){
-                    this._dispatchEvent(InputController.ACTION_DEACTIVATED, name)
-                }
-            }
-            return
-        }
         if(!this.actions[actionName])return
         this.actions[actionName].enabled=false
         if(this.actionStatus[actionName]){
