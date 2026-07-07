@@ -1,4 +1,4 @@
-import{InputController} from './input-controller.js'
+import{ACTION_ACTIVATED, ACTION_DEACTIVATED, InputController } from './input-controller.js'
 const container = document.querySelector('.container')
 
 let square = document.createElement('div');
@@ -6,7 +6,9 @@ square.classList.add('square');
 square.style.width = '100px';
 square.style.height = '100px';
 square.style.backgroundColor = 'blue';
+square.setAttribute('tabindex','0')
 container.appendChild(square);
+square.focus()
 let positionX = 0;
 
 let actionsToBind = {
@@ -45,6 +47,7 @@ const buttonNew=document.querySelector('.newAction')
 
 buttonAttach.addEventListener('click', ()=>{
     controller.attach(square,false)
+    console.log(square)
 })
 buttonDetach.addEventListener('click', ()=>{
     controller.detach()
@@ -52,28 +55,33 @@ buttonDetach.addEventListener('click', ()=>{
 buttonActivation.addEventListener('click', ()=>{ 
     for( let nameAction in actionsToBind){
         controller.enableAction(nameAction)
+        renderCheckboxes();
     }
 })
 buttonDeactivation.addEventListener('click', ()=>{
     for( let nameAction in actionsToBind){
         controller.disableAction(nameAction)
+        renderCheckboxes();
+
     }
 })
 
-document.addEventListener(controller.ACTION_ACTIVATED, (event) =>{
+document.addEventListener(ACTION_ACTIVATED, (event) =>{
     const actionName = event.detail.action;
     if(activationAction[actionName]!==undefined){
-        activationAction[actionName](square)
+        activationAction[actionName](event.detail.target)
     }
     
 
 })
-document.addEventListener(controller.ACTION_DEACTIVATED, (event) =>{
+document.addEventListener(ACTION_DEACTIVATED, (event) =>{
     const actionName = event.detail.action;
     if(deactivationAction[actionName]!==undefined){
-        deactivationAction[actionName](square)
+        deactivationAction[actionName](event.detail.target)
     }
 })
+
+
 buttonNew.addEventListener('click', ()=>{
     const form = document.createElement('form');
     const inputName = document.createElement('input');
@@ -130,16 +138,21 @@ buttonNew.addEventListener('click', ()=>{
 
 const containerList = document.createElement('div');
 container.append(containerList)
+
 containerList.addEventListener('change', (e) => {
   
     if (e.target.tagName === 'INPUT' && e.target.type === 'checkbox') {
+        console.log(e.target.value)
         if (e.target.checked) {
             controller.enableAction(e.target.value);
+            
         } else {
             controller.disableAction(e.target.value);
+            console.log(actionsToBind[e.target.value].enabled)
         }
     }
 })
+
 function renderCheckboxes() {
 
     containerList.innerHTML = ''; 
