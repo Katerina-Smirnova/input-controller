@@ -97,15 +97,7 @@ export class InputController {
     }
 
     _handleKeyDown(event){
-        if(!this.enabled || !this.focused){
-           for (let actionName in this.actions){
-                this.actionStatus[actionName] = false
-                for (let key in this.actions[actionName]){
-                    this.keyStatus[key]=false
-                }
-           }
-           return
-        } 
+        if(!this.enabled || !this.focused) return 
   
         const keyCode = event.keyCode;
         this.keyStatus[keyCode] = true
@@ -121,16 +113,6 @@ export class InputController {
         }
     }
     _handleKeyUp(event){
-        if(!this.enabled || !this.focused) {
-            for (let actionName in this.actions){
-                this.actionStatus[actionName] = false
-                for (let key in this.actions[actionName]){
-                    this.keyStatus[key]=false
-                }
-           }
-           return
-        }
-   
         const keyCode = event.keyCode;
         this.keyStatus[keyCode] = false
 
@@ -147,12 +129,13 @@ export class InputController {
                     break
                 }
             }
-            if(allKey && this.actionStatus[actionName]){
+            if(allKey && this.actionStatus[actionName] ){
                 this.actionStatus[actionName] = false
-                this._dispatchEvent(InputController.ACTION_DEACTIVATED, actionName)
-            }
-
-            
+                if(this.enabled && this.focused){
+                    this._dispatchEvent(InputController.ACTION_DEACTIVATED, actionName)
+                }
+                
+            }      
         }
     }
     _dispatchEvent(name, action){
