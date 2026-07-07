@@ -20,6 +20,9 @@ let actionsToBind = {
         keys: [39,68], 
         enabled: false
     },
+    "active":{
+        keys:[]
+    }
     // "jump":{
     //     keys: [32], 
     //     enabled: false

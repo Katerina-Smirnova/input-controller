@@ -6,10 +6,10 @@ export class InputController {
         this.focused = true;
         this.actions = {};
         this.target=null;
-        this.keyStatus = {};
+
         this.actionStatus = {};
-        this._handleKeyDown=this._handleKeyDown.bind(this);
-        this._handleKeyUp=this._handleKeyUp.bind(this);
+        this.plagins={}
+
         this._handleFocus=this._handleFocus.bind(this)
         this._handleBlur=this._handleBlur.bind(this)
         if(actionsToBind){
@@ -42,6 +42,16 @@ export class InputController {
             }
         }
     }
+    addPlagin(plagin){
+        this.plagins.push(plagin)
+        plagin.init(this)
+
+    }
+    removePlagin(plagin){
+        this.plagins = this.plagins.filter(namePlagin => namePlagin!==plagin)
+        plagin.disable()
+    }
+
     bindActions(actionsToBind){
         Object.assign(this.actions,actionsToBind)
         for (let name in actionsToBind){
@@ -55,9 +65,6 @@ export class InputController {
         if(!this.actions[actionName])return
         this.actions[actionName].enabled=true 
         this.actionStatus[actionName] = false
-        for (let key of this.actions[actionName].keys){
-            this.keyStatus[key]=false
-        }
     }
     disableAction(actionName){
         if(!this.actions[actionName])return
@@ -76,8 +83,6 @@ export class InputController {
         if(!dontEnable){
             this.enabled = true;
         }
-        document.addEventListener('keydown', this._handleKeyDown)
-        document.addEventListener('keyup', this._handleKeyUp)
         this.target.addEventListener('focus', this._handleFocus)
         this.target.addEventListener('blur', this._handleBlur)
 
@@ -85,14 +90,11 @@ export class InputController {
     detach(){
      
         if(!this.target) return
-        document.removeEventListener('keydown', this._handleKeyDown)
-        document.removeEventListener('keyup', this._handleKeyUp)
         this.target.removeEventListener('focus', this._handleFocus)
         this.target.removeEventListener('blur', this._handleBlur)
 
         this.target=null;
         this.enabled = false;
-        this.keyStatus = {};
         this.actionStatus = {};
         this.focused=false;
     }
@@ -100,62 +102,36 @@ export class InputController {
         if(!this.actions[actionName]) return false
         if(!this.actions[actionName].enabled)return false
 
-        const action = this.actions[actionName]
-        let keyActive = false
-            for (let key of action.keys){
-                if(this.keyStatus[key]){
-                    keyActive = true
-                    break
-                }
-            }
+        // const action = this.actions[actionName]
+        // let keyActive = false
+        //     for (let key of action.keys){
+        //         if(this.keyStatus[key]){
+        //             keyActive = true
+        //             break
+        //         }
+        //     }
         
-        return keyActive
+        // return keyActive
     }
-    isKeyPressed(keyCode){
-        return this.keyStatus[keyCode]||false
-    }
+    // isKeyPressed(keyCode){
+    //     return this.keyStatus[keyCode]||false
+    // }
 
-    _handleKeyDown(event){
+    // 
+    _activateAction(actionName){
         if(!this.enabled || !this.focused) return 
-  
-        const keyCode = event.keyCode;
-        this.keyStatus[keyCode] = true
-
-        for(let actionName in this.actions){
-            const action = this.actions[actionName];
-            if(!action.enabled)continue
-            if(!action.keys.includes(keyCode))continue
-            if(!this.actionStatus[actionName]){
-                this.actionStatus[actionName]=true
-                this._dispatchEvent(InputController.ACTION_ACTIVATED, actionName) 
-            }
+        if(!this.actionStatus[actionName]){
+            this.actionStatus[actionName]=true
+            this._dispatchEvent(InputController.ACTION_ACTIVATED, actionName) 
         }
     }
-    _handleKeyUp(event){
-        const keyCode = event.keyCode;
-        this.keyStatus[keyCode] = false
-
-        for(let actionName in this.actions){
-            const action = this.actions[actionName];
-            if(!action.enabled) continue
-            if(!action.keys.includes(keyCode))continue
-
-            let allKey = true
-
-            for (let key of action.keys){
-                if(this.keyStatus[key]){
-                    allKey = false
-                    break
-                }
+    _deactivateAction(actionName){
+        if( this.actionStatus[actionName] ){
+            this.actionStatus[actionName] = false
+            if(this.enabled && this.focused){
+                this._dispatchEvent(InputController.ACTION_DEACTIVATED, actionName)
             }
-            if(allKey && this.actionStatus[actionName] ){
-                this.actionStatus[actionName] = false
-                if(this.enabled && this.focused){
-                    this._dispatchEvent(InputController.ACTION_DEACTIVATED, actionName)
-                }
-                
-            }      
-        }
+        }    
     }
     _dispatchEvent(name, action){
         const event = new CustomEvent(name,{
