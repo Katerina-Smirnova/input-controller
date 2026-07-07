@@ -1,4 +1,4 @@
-import{ACTION_ACTIVATED, ACTION_DEACTIVATED, InputController } from './input-controller.js'
+import{ InputController } from './input-controller.js'
 const container = document.querySelector('.container')
 
 let square = document.createElement('div');
@@ -35,7 +35,12 @@ const activationAction = {
         element.style.transform = `translateX(${positionX}px)`;
     }
 }
-const deactivationAction ={}
+const deactivationAction ={
+    right: (element) => {
+        positionX-=10
+        element.style.transform = `translateX(${positionX}px)`;
+    }
+}
 
 const controller = new InputController(actionsToBind, container)
 
@@ -66,7 +71,7 @@ buttonDeactivation.addEventListener('click', ()=>{
     }
 })
 
-document.addEventListener(ACTION_ACTIVATED, (event) =>{
+document.addEventListener(InputController.ACTION_ACTIVATED, (event) =>{
     const actionName = event.detail.action;
     if(activationAction[actionName]!==undefined){
         activationAction[actionName](event.detail.target)
@@ -74,7 +79,7 @@ document.addEventListener(ACTION_ACTIVATED, (event) =>{
     
 
 })
-document.addEventListener(ACTION_DEACTIVATED, (event) =>{
+document.addEventListener(InputController.ACTION_DEACTIVATED, (event) =>{
     const actionName = event.detail.action;
     if(deactivationAction[actionName]!==undefined){
         deactivationAction[actionName](event.detail.target)

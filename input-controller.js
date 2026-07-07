@@ -1,6 +1,6 @@
-export const ACTION_ACTIVATED ="input-controller:action-activate";
-export const ACTION_DEACTIVATED = "input-controller:deactivate";
 export class InputController {
+    static ACTION_ACTIVATED ="input-controller:action-activate";
+    static ACTION_DEACTIVATED = "input-controller:deactivate";
     constructor(actionsToBind, target){
         this.enabled = false;
         this.focused = true;
@@ -12,6 +12,7 @@ export class InputController {
         this._helderKeyUp=this._helderKeyUp.bind(this);
         this._helderFocus=this._helderFocus.bind(this)
         this._helderBlur=this._helderBlur.bind(this)
+
 
 
         if(actionsToBind){
@@ -103,7 +104,7 @@ export class InputController {
             if(!action.keys.includes(keyCode))continue
             if(!this.actionStatus[actionName]){
                 this.actionStatus[actionName]=true
-                this._dispatchEvent(ACTION_ACTIVATED, actionName) 
+                this._dispatchEvent(InputController.ACTION_ACTIVATED, actionName) 
             }
         }
     }
@@ -121,6 +122,7 @@ export class InputController {
             let allKey = true
 
             for (let key of action.keys){
+                console.log(key,this.keyStatus[key] )
                 if(this.keyStatus[key]){
                     allKey = false
                     break
@@ -128,11 +130,9 @@ export class InputController {
             }
             if(allKey && this.actionStatus[actionName]){
                 this.actionStatus[actionName] = false
+                this._dispatchEvent(InputController.ACTION_DEACTIVATED, actionName)
             }
 
-            if(action.enabled){
-                this._dispatchEvent(ACTION_DEACTIVATED, actionName)
-            }
             
         }
     }
@@ -147,12 +147,12 @@ export class InputController {
         this.target.dispatchEvent(event)
     }
     _helderFocus(event){
-        console.log('true')
+        // console.log('true')
         this.focused=true
         
     }
     _helderBlur(event){
-        console.log('false')
+        // console.log('false')
         this.focused=false
         
     }
