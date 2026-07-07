@@ -52,26 +52,16 @@ const buttonNew=document.querySelector('.newAction')
 
 buttonAttach.addEventListener('click', ()=>{
     controller.attach(square,false)
-    console.log(square)
 })
 buttonDetach.addEventListener('click', ()=>{
     controller.detach()
 }) 
 buttonActivation.addEventListener('click', ()=>{
     controller.enabled = true 
-    // for( let nameAction in actionsToBind){
-    //     controller.enableAction(nameAction)
-    //     renderCheckboxes();
-    // }
+
 })
 buttonDeactivation.addEventListener('click', ()=>{
     controller.enabled = false
-    // for( let nameAction in actionsToBind){
-    //     controller.disableAction(nameAction)
-        
-    //     renderCheckboxes();
-
-    // }
 })
 
 document.addEventListener(InputController.ACTION_ACTIVATED, (event) =>{
@@ -129,7 +119,6 @@ buttonNew.addEventListener('click', ()=>{
     const userDeactivationCode = inputDeactivetion.value;
     deactivationAction[nameValue]= new Function('element', userDeactivationCode);
     form.remove();
-    console.log(activationAction[nameValue])
     const newAction = {
         [nameValue] : {
             keys: keysValue, 

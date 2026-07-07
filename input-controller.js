@@ -99,10 +99,10 @@ export class InputController {
     _handleKeyDown(event){
         if(!this.enabled || !this.focused){
            for (let actionName in this.actions){
-            this.actionStatus[actionName] = false
-            for (let key in this.actions[actionName]){
-                this.keyStatus[key]=false
-            }
+                this.actionStatus[actionName] = false
+                for (let key in this.actions[actionName]){
+                    this.keyStatus[key]=false
+                }
            }
            return
         } 
@@ -123,10 +123,10 @@ export class InputController {
     _handleKeyUp(event){
         if(!this.enabled || !this.focused) {
             for (let actionName in this.actions){
-            this.actionStatus[actionName] = false
-            for (let key in this.actions[actionName]){
-                this.keyStatus[key]=false
-            }
+                this.actionStatus[actionName] = false
+                for (let key in this.actions[actionName]){
+                    this.keyStatus[key]=false
+                }
            }
            return
         }
@@ -166,12 +166,10 @@ export class InputController {
         this.target.dispatchEvent(event)
     }
     _handleFocus(event){
-        // console.log('true')
         this.focused=true
         
     }
     _handleBlur(event){
-        // console.log('false')
         this.focused=false
         
     }
