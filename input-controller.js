@@ -33,6 +33,15 @@ export class InputController {
         }
     }
     enableAction(actionName){
+        if (actionName===undefined){
+            this.enabled = true
+            for(let name in this.actions){
+                if(this.actionStatus[name]==true){
+                    this._dispatchEvent(InputController.ACTION_ACTIVATED, name) 
+                }
+            }
+            return
+        }
         if(!this.actions[actionName])return
         this.actions[actionName].enabled=true 
         this.actionStatus[actionName] = false
@@ -41,6 +50,15 @@ export class InputController {
         }
     }
     disableAction(actionName){
+          if (actionName===undefined){
+            this.enabled = false
+            for(let name in this.actions){
+                if(this.actionStatus[name]==true){
+                    this._dispatchEvent(InputController.ACTION_DEACTIVATED, name)
+                }
+            }
+            return
+        }
         if(!this.actions[actionName])return
         this.actions[actionName].enabled=false
         if(this.actionStatus[actionName]){
