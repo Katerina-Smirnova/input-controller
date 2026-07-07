@@ -99,8 +99,6 @@ export class InputController {
     _handleKeyDown(event){
         if(!this.enabled || !this.focused){
            for (let actionName in this.actions){
-            console.log(actionName)
-            console.log(this.actionStatus[actionName])
             this.actionStatus[actionName] = false
             for (let key in this.actions[actionName]){
                 this.keyStatus[key]=false
