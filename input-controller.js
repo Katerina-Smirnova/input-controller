@@ -8,7 +8,7 @@ export class InputController {
         this.target=null;
 
         this.actionStatus = {};
-        this.plagins={}
+        this.plugins=[]
 
         this._handleFocus=this._handleFocus.bind(this)
         this._handleBlur=this._handleBlur.bind(this)
@@ -34,6 +34,7 @@ export class InputController {
             }
         }
         else{
+            
             this._enabled = false
             for(let name in this.actions){
                 if(this.actionStatus[name]==true){
@@ -41,21 +42,26 @@ export class InputController {
                 }
             }
         }
+        console.log(this._enabled)
+         
     }
-    addPlagin(plagin){
-        this.plagins.push(plagin)
-        plagin.init(this)
+    addPlagin(plugin, pluginName){
+        this.plugins.push(plugin)
+        plugin.init(this)
+        let allAction = Object.fromEntries(Object.keys(this.actions).map(key=>[key,false]))
+        this.actionStatus[pluginName]=allAction
 
     }
-    removePlagin(plagin){
-        this.plagins = this.plagins.filter(namePlagin => namePlagin!==plagin)
-        plagin.disable()
+    removePlagin(plugin,pluginName){
+        plugin.disable()
+        this.plugins = this.plugins.filter(namePlugin => namePlugin!==plugin)
+        delete this.actionStatus[pluginName]
     }
 
     bindActions(actionsToBind){
         Object.assign(this.actions,actionsToBind)
         for (let name in actionsToBind){
-            this.actionStatus[name] = false;
+            // this.actionStatus[name] = false;
             if(actionsToBind[name].enabled===undefined){
                 actionsToBind[name].enabled = true;
             }
@@ -64,13 +70,15 @@ export class InputController {
     enableAction(actionName){
         if(!this.actions[actionName])return
         this.actions[actionName].enabled=true 
-        this.actionStatus[actionName] = false
+        for(let plugin in this.actionStatus){
+            this.actionStatus[plugin][actionName]=false
+        }
     }
     disableAction(actionName){
         if(!this.actions[actionName])return
         this.actions[actionName].enabled=false
-        if(this.actionStatus[actionName]){
-            this.actionStatus[actionName]=false
+         for(let plugin in this.actionStatus){
+            this.actionStatus[plugin][actionName]=false
         }
     }
     attach(target, dontEnable){
@@ -95,45 +103,46 @@ export class InputController {
 
         this.target=null;
         this.enabled = false;
-        this.actionStatus = {};
         this.focused=false;
+        this.actionStatus = {};
     }
     isActionActive(actionName){
         if(!this.actions[actionName]) return false
         if(!this.actions[actionName].enabled)return false
 
-        // const action = this.actions[actionName]
-        // let keyActive = false
-        //     for (let key of action.keys){
-        //         if(this.keyStatus[key]){
-        //             keyActive = true
-        //             break
-        //         }
-        //     }
-        
-        // return keyActive
+       return true
     }
     // isKeyPressed(keyCode){
     //     return this.keyStatus[keyCode]||false
     // }
-
-    // 
-    _activateAction(actionName){
-        if(!this.enabled || !this.focused) return 
-        if(!this.actionStatus[actionName]){
-            this.actionStatus[actionName]=true
+    _activateAction(actionName, pluginName){
+        console.log('activate')
+        let inAll = true
+        for(let plugin in this.actionStatus){
+            if(this.actionStatus[plugin][actionName]==true){
+                inAll=false
+            }
+        }
+        if(inAll){
             this._dispatchEvent(InputController.ACTION_ACTIVATED, actionName) 
         }
+        this.actionStatus[pluginName][actionName] = true
+
     }
-    _deactivateAction(actionName){
-        if( this.actionStatus[actionName] ){
-            this.actionStatus[actionName] = false
-            if(this.enabled && this.focused){
-                this._dispatchEvent(InputController.ACTION_DEACTIVATED, actionName)
+    _deactivateAction(actionName, pluginName){
+        let inAll=true
+        for(let plugin in this.actionStatus){
+            if(plugin!==pluginName && this.actionStatus[plugin][actionName]==true){
+                inAll=false
             }
-        }    
+        }
+        if(inAll){
+            this._dispatchEvent(InputController.ACTION_DEACTIVATED, actionName)
+        }
+        this.actionStatus[pluginName][actionName] = false 
     }
     _dispatchEvent(name, action){
+        if (this.target===null)return 
         const event = new CustomEvent(name,{
             detail:{
                 target: this.target,
@@ -148,8 +157,6 @@ export class InputController {
         
     }
     _handleBlur(event){
-        this.focused=false
-        
+        this.focused=false  
     }
-
 }

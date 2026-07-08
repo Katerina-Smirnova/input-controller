@@ -1,4 +1,4 @@
-export class KeyborbPlagin{
+export class KeyborbPlugin{
     constructor(){
         this.controller=null
         this.keyStatus = {};
@@ -17,23 +17,39 @@ export class KeyborbPlagin{
     }
    
 
-    _handleKeyDown(event){
-        // if(!this.controller.enabled || !this.controller.focused) return 
+    _handleKeyDown(event){  
+       
         const keyCode = event.keyCode;
         this.keyStatus[keyCode] = true
 
         for(let actionName in this.controller.actions){
             const action = this.controller.actions[actionName];
-            if(!action.controller.enabled)continue // запрещенно действие 
+            console.log('/')
+            console.log(this.controller.enabled )
+            console.log(action.enabled )
+            console.log(this.controller.focused )
+            if(!this.controller.enabled || !action.enabled || !this.controller.focused)continue 
+            console.log('Down') 
             if(!action.keys.includes(keyCode))continue 
-            this.controller._activateAction(actionName)
+            
+            let allKey = true
+
+            for (let key of action.keys){
+                if(key!== keyCode && this.keyStatus[key]===true ){
+                    allKey = false
+                    break
+                }
+            }
+            if(allKey){
+                this.controller._activateAction(actionName,'keybord')
+            }
+           
         }
     }
     _handleKeyUp(event){
         const keyCode = event.keyCode;
         this.keyStatus[keyCode] = false
-
-        for(let actionName in this.actions){
+        for(let actionName in this.controller.actions){
             const action = this.controller.actions[actionName];
             if(!action.enabled) continue
             if(!action.keys.includes(keyCode))continue
@@ -41,13 +57,13 @@ export class KeyborbPlagin{
             let allKey = true
 
             for (let key of action.keys){
-                if(this.keyStatus[key]){
+                if(this.keyStatus[key]===true){
                     allKey = false
                     break
                 }
             }
             if(allKey){
-                this.controller._deactivateAction()
+                this.controller._deactivateAction(actionName,'keybord')
             }
   
         }
