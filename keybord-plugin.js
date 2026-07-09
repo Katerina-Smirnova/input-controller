@@ -24,12 +24,7 @@ export class KeyborbPlugin{
 
         for(let actionName in this.controller.actions){
             const action = this.controller.actions[actionName];
-            console.log('/')
-            console.log(this.controller.enabled )
-            console.log(action.enabled )
-            console.log(this.controller.focused )
-            if(!this.controller.enabled || !action.enabled || !this.controller.focused)continue 
-            console.log('Down') 
+            if(!this.controller.enabled || !action.enabled || !this.controller.focused)continue  
             if(!action.keys.includes(keyCode))continue 
             
             let allKey = true
@@ -51,7 +46,7 @@ export class KeyborbPlugin{
         this.keyStatus[keyCode] = false
         for(let actionName in this.controller.actions){
             const action = this.controller.actions[actionName];
-            if(!action.enabled) continue
+             if(!this.controller.enabled || !action.enabled || !this.controller.focused)continue  
             if(!action.keys.includes(keyCode))continue
 
             let allKey = true

@@ -136,7 +136,6 @@ function keybordEvents(event){
         return}
     if(keyCode===50) {controller.detach(); return}
     if(keyCode===51) {
-        console.log(51)
         controller.enabled=true; 
         return}
     if(keyCode===52) {controller.enabled=false; return}
@@ -212,58 +211,58 @@ document.addEventListener(InputController.ACTION_DEACTIVATED, (event) =>{
 })
 
 
-// buttonNew.addEventListener('click', ()=>{
-//     const form = document.createElement('form');
-//     const inputName = document.createElement('input');
-//     const inputKey = document.createElement('input');
-//     const inputActivetion = document.createElement('input');
-//     const inputDeactivetion = document.createElement('input');
-//     const button = document.createElement('button')
-//     inputName.type = 'text';
-//     inputName.placeholder = 'Введите название действия';
-//     inputKey.type = 'text';
-//     inputKey.placeholder = 'Введите номера кнопок';
-//     inputActivetion.type = 'text';
-//     inputActivetion.placeholder = 'Введите код для дейстия';
-//     inputDeactivetion.type = 'text';
-//     inputDeactivetion.placeholder = 'Введите код для окончания действия';
+buttonNew.addEventListener('click', ()=>{
+    const form = document.createElement('form');
+    const inputName = document.createElement('input');
+    const inputKey = document.createElement('input');
+    const inputActivetion = document.createElement('input');
+    const inputDeactivetion = document.createElement('input');
+    const button = document.createElement('button')
+    inputName.type = 'text';
+    inputName.placeholder = 'Введите название действия';
+    inputKey.type = 'text';
+    inputKey.placeholder = 'Введите номера кнопок';
+    inputActivetion.type = 'text';
+    inputActivetion.placeholder = 'Введите код для дейстия';
+    inputDeactivetion.type = 'text';
+    inputDeactivetion.placeholder = 'Введите код для окончания действия';
 
-//     button.type = 'submit';
-//     button.textContent = 'Отправить';
-//     form.appendChild(inputName);
-//     form.appendChild(inputKey);
-//     form.appendChild(inputActivetion);
-//     form.appendChild(inputDeactivetion);
-//     form.appendChild(button);
-//     container.appendChild(form);
-//     form.addEventListener('submit', function(event) {
-//         event.preventDefault(); 
-//         const nameValue = inputName.value.trim();
-//         const keysValue = inputKey.value.split(',').map(Number);
+    button.type = 'submit';
+    button.textContent = 'Отправить';
+    form.appendChild(inputName);
+    form.appendChild(inputKey);
+    form.appendChild(inputActivetion);
+    form.appendChild(inputDeactivetion);
+    form.appendChild(button);
+    container.appendChild(form);
+    form.addEventListener('submit', function(event) {
+        event.preventDefault(); 
+        const nameValue = inputName.value.trim();
+        const keysValue = inputKey.value.split(',').map(Number);
 
-//         actionsToBind[nameValue] = {
-//             keys: keysValue, 
-//                 enabled: false,
-//         }
-//         const userCode = inputActivetion.value; 
-//     activationAction[nameValue] = new Function('element', userCode);
+        actionsToBind[nameValue] = {
+            keys: keysValue, 
+                enabled: false,
+        }
+        const userCode = inputActivetion.value; 
+    activationAction[nameValue] = new Function('element', userCode);
 
-//         const userDeactivationCode = inputDeactivetion.value;
-//         deactivationAction[nameValue]= new Function('element', userDeactivationCode);
-//         form.remove();
-//         const newAction = {
-//             [nameValue] : {
-//                 keys: keysValue, 
-//                 enabled: false,
-//             }
-//         }
-//         controller.bindActions(newAction)
-//         controller.enableAction(nameValue)
-//         renderCheckboxes();
+        const userDeactivationCode = inputDeactivetion.value;
+        deactivationAction[nameValue]= new Function('element', userDeactivationCode);
+        form.remove();
+        const newAction = {
+            [nameValue] : {
+                keys: keysValue, 
+                enabled: false,
+            }
+        }
+        controller.bindActions(newAction)
+        controller.enableAction(nameValue)
+        renderCheckboxes();
 
-//     });
+    });
 
-// })
+})
 
 const containerList = document.createElement('div');
 container.append(containerList)
@@ -276,13 +275,11 @@ containerList.addEventListener('click',(e)=>{
 containerList.addEventListener('change', (e) => {
    if (isClicksBlocked){
         if (e.target.tagName === 'INPUT' && e.target.type === 'checkbox') {
-            console.log(e.target.value)
-            if (actionsToBind[e.target.value].enable) {
+            if (e.target.checked && !actionsToBind[e.target.value].enabled) {
                 controller.enableAction(e.target.value);
                 
             } else {
                 controller.disableAction(e.target.value);
-                console.log(actionsToBind[e.target.value].enabled)
             }
         }
     }
