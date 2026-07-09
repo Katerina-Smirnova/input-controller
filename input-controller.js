@@ -49,7 +49,14 @@ export class InputController {
     }
     addPlagin(plugin, pluginName){
         this.plugins.push(plugin)
-        plugin.init(this)
+        const callback ={
+            isEnabled:()=>this.enabled,
+            isFocused:()=>this.focused,
+            getActions:()=>this.actions,
+            activateAction:(actionName)=>{this._activateAction(actionName, pluginName)},
+            deactivateAction:(actionName)=>{this._deactivateAction(actionName, pluginName)}
+        }
+        plugin.init(callback)
         let allAction = Object.fromEntries(Object.keys(this.actions).map(key=>[key,false]))
         this.actionStatus[pluginName]=allAction
 

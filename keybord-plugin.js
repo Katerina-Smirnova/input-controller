@@ -1,12 +1,12 @@
 export class KeyborbPlugin{
     constructor(){
-        this.controller=null
+        this.callback=null
         this.keyStatus = {};
         this._handleKeyDown=this._handleKeyDown.bind(this);
         this._handleKeyUp=this._handleKeyUp.bind(this);
     }
-    init(controller){
-        this.controller=controller
+    init(callback){
+        this.callback=callback
         
         document.addEventListener('keydown', this._handleKeyDown)
         document.addEventListener('keyup', this._handleKeyUp)
@@ -18,13 +18,16 @@ export class KeyborbPlugin{
    
 
     _handleKeyDown(event){  
-       
+        const isEnabled = this.callback.isEnabled();
+        const isFocused = this.callback.isFocused(); 
+        const actions = this.callback.getActions(); 
+
         const keyCode = event.keyCode;
         this.keyStatus[keyCode] = true
 
-        for(let actionName in this.controller.actions){
-            const action = this.controller.actions[actionName];
-            if(!this.controller.enabled || !action.enabled || !this.controller.focused)continue  
+        for(let actionName in actions){
+            const action = actions[actionName];
+            if(!isEnabled || !action.enabled || !isFocused)continue  
             if(!action.keys.includes(keyCode))continue 
             
             let allKey = true
@@ -36,17 +39,22 @@ export class KeyborbPlugin{
                 }
             }
             if(allKey){
-                this.controller._activateAction(actionName,'keybord')
+                this.callback.activateAction(actionName)
             }
-           
+        
         }
     }
     _handleKeyUp(event){
+        const isEnabled = this.callback.isEnabled();
+        const isFocused = this.callback.isFocused(); 
+        const actions = this.callback.getActions(); 
+
         const keyCode = event.keyCode;
         this.keyStatus[keyCode] = false
-        for(let actionName in this.controller.actions){
-            const action = this.controller.actions[actionName];
-             if(!this.controller.enabled || !action.enabled || !this.controller.focused)continue  
+
+        for(let actionName in actions){
+            const action = actions[actionName];
+             if(!isEnabled || !action.enabled || !isFocused)continue  
             if(!action.keys.includes(keyCode))continue
 
             let allKey = true
@@ -58,9 +66,8 @@ export class KeyborbPlugin{
                 }
             }
             if(allKey){
-                this.controller._deactivateAction(actionName,'keybord')
+                this.callback.deactivateAction(actionName)
             }
-  
         }
     }
 }
